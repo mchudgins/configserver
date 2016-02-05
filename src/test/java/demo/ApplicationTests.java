@@ -43,4 +43,19 @@ public class ApplicationTests {
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
 	}
 
+	@Test
+	public void configurationAvailableAsJSON() {
+		@SuppressWarnings("rawtypes")
+		ResponseEntity<Map> entity = new TestRestTemplate().getForEntity(
+				"http://localhost:" + port + "/app-cloud.json", Map.class);
+		assertEquals(HttpStatus.OK, entity.getStatusCode());
+	}
+
+	@Test
+	public void configurationAvailableAsProperties() {
+		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
+				"http://localhost:" + port + "/app-cloud.properties", String.class);
+		assertEquals(HttpStatus.OK, entity.getStatusCode());
+	}
+
 }
