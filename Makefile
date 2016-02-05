@@ -5,7 +5,7 @@
 # have been previously installed.
 #
 
-MVN=/opt/maven/bin/mvn
+MVN=./mvnw
 
 BUILD_NUMBER_FILE=build.num
 BUILD_NUM := $(cat build.num)
@@ -23,10 +23,12 @@ container_deps := $(DOCKER_DIR)/Dockerfile target/$(ARTIFACT)
 
 all: container
 
-container: $(container_deps)
+target/$(ARTIFACT)
 	$(MVN) package
+
+container: $(container_deps)
 	cp target/$(ARTIFACT) $(DOCKER_DIR)
-	sudo docker build -t config-server $(DOCKER_DIR)
+	sudo docker build -t $(ARTIFACT_NAME)-$(APP_VERSION):$(BUILD_NUM) $(DOCKER_DIR)
 	
 target/k8sInstanceDiscovery-0.0.1-SNAPSHOT.jar:
 	mvn package
