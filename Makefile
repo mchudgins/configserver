@@ -8,7 +8,7 @@
 MVN=./mvnw
 
 BUILD_NUMBER_FILE=build.num
-BUILD_NUM := $(cat build.num)
+BUILD_NUM := $(shell cat build.num)
 
 APP_VERSION := $(shell xml_grep --root /project/version --text pom.xml)
 ARTIFACT_NAME := $(shell xml_grep --root /project/artifactId --text pom.xml)
@@ -17,25 +17,19 @@ ARTIFACT := $(ARTIFACT_NAME)-$(APP_VERSION).jar
 DOCKER_DIR=src/main/docker
 
 
-container_deps := $(DOCKER_DIR)/Dockerfile target/$(ARTIFACT)
+container_deps := $(DOCKER_DIR)/Dockerfile target/$(ARTIFACT) $(BUILD_NUMBER_FILE)
 
 .PHONY: container clean push $(BUILD_NUMBER_FILE)
 
 all: container
 
-target/$(ARTIFACT)
+target/$(ARTIFACT):
 	$(MVN) package
 
 container: $(container_deps)
 	cp target/$(ARTIFACT) $(DOCKER_DIR)
-	sudo docker build -t $(ARTIFACT_NAME)-$(APP_VERSION):$(BUILD_NUM) $(DOCKER_DIR)
+	sudo docker build -t $(ARTIFACT_NAME):$(APP_VERSION) $(DOCKER_DIR)
 	
-target/k8sInstanceDiscovery-0.0.1-SNAPSHOT.jar:
-	mvn package
-	
-turbine-web.war:
-	curl https://repo1.maven.org/maven2/com/netflix/turbine/turbine-web/$(TURBINE_VERSION)/turbine-web-$(TURBINE_VERSION).war -o turbine-web.war	
-
 run_container:
 	sudo docker run -it --rm -p 9080:8080 -e POD_NAMESPACE=k8s-dev turbine
 	
