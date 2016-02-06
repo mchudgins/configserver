@@ -1,0 +1,26 @@
+{
+   "kind":"Service",
+   "apiVersion":"v1",
+   "metadata":{
+      "name":"config",
+      "labels":{
+         "name":"config",
+         "owner":"mch",
+         "app":"config"
+      }
+   },
+   "spec":{
+      "ports": [
+        {
+          "name":"http",
+          "port":80,
+          "targetPort":8888,
+          "protocol":"TCP"
+        }
+      ],
+      "selector":{
+         "name":"config",
+         "app":"config"
+      }
+   }
+}

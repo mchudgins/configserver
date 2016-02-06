@@ -1,0 +1,50 @@
+{
+   "kind":"ReplicationController",
+   "apiVersion":"v1",
+   "metadata":{
+      "name":"config",
+      "labels":{
+         "name":"config",
+         "owner":"mch",
+         "app":"config"
+      }
+   },
+   "spec":{
+      "replicas":1,
+      "selector":{
+         "name":"config",
+         "app":"config"
+      },
+      "template":{
+         "metadata":{
+            "labels":{
+               "name":"config",
+               "app":"config"
+            }
+         },
+         "spec":{
+            "containers":[
+               {
+                  "name":"config",
+                  "image":"registry.dstresearch.com/library/configserver:0.0.1-SNAPSHOT",
+                  "env" : [
+                     {
+                        "name" : "GIT_REPO_URL",
+                        "value": "https://github.com/mchudgins/configserver.git"
+                     }
+                  ],
+                  "ports":[
+                     {
+                        "containerPort":8888,
+                        "protocol":"TCP"
+                     }
+                  ]
+               }
+            ],
+           "imagePullSecrets": [
+               { "name" : "dstresearchkey" }
+            ]
+         }
+      }
+   }
+}
