@@ -29,10 +29,12 @@ target/$(ARTIFACT):
 container: $(container_deps)
 	cp target/$(ARTIFACT) $(DOCKER_DIR)
 	sudo docker build -t $(ARTIFACT_NAME):$(APP_VERSION) $(DOCKER_DIR)
-	
+
 run_container:
-	sudo docker run -it --rm -p 9080:8080 -e POD_NAMESPACE=k8s-dev turbine
-	
+	sudo docker run -it --rm -p 8888:8888 \
+		-e GIT_REPO_URL="https://github.com/mchudgins/testRepo.git" \
+		$(ARTIFACT_NAME):$(APP_VERSION)
+
 push:
 	- sudo docker rmi registry.dstresearch.com/turbine
 	sudo docker tag turbine registry.dstresearch.com/turbine
@@ -43,5 +45,5 @@ $(BUILD_NUMBER_FILE):
 	@echo $$(($$(cat $(BUILD_NUMBER_FILE)) + 1)) > $(BUILD_NUMBER_FILE)
 
 clean:
-	mvn clean
+	$(MVN) clean
 	- rm -f *.jar
