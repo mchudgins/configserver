@@ -36,9 +36,9 @@ run_container:
 		$(ARTIFACT_NAME):$(APP_VERSION)
 
 push:
-	- sudo docker rmi registry.dstresearch.com/turbine
-	sudo docker tag turbine registry.dstresearch.com/turbine
-	sudo docker push registry.dstresearch.com/turbine
+	- sudo docker rmi registry.dstresearch.com/$(ARTIFACT_NAME):$(APP_VERSION)
+	sudo docker tag $(ARTIFACT_NAME):$(APP_VERSION) registry.dstresearch.com/$(ARTIFACT_NAME):$(APP_VERSION)
+	sudo docker push registry.dstresearch.com/$(ARTIFACT_NAME):$(APP_VERSION)
 
 $(BUILD_NUMBER_FILE):
 	@if ! test -f $(BUILD_NUMBER_FILE); then echo 0 > $(BUILD_NUMBER_FILE); echo setting file to zero; fi
