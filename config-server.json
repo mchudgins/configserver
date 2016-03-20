@@ -37,7 +37,7 @@
             {
                "description": "Git Configuration Repository",
                "name": "CONFIG_SETTINGS_REPO",
-               "value": "https://github.com/mchudgins/config-props.git"
+               "value": "https://github.com/mchudgins/testRepo.git"
             },
             {
                "description": "Application options. These options will be passed to the Spring Boot command line",
@@ -64,19 +64,6 @@
                   "triggers": [
                      {
                         "type": "ConfigChange"
-                     },
-                     {
-                        "type": "ImageChange",
-                        "imageChangeParams": {
-                           "automatic": true,
-                           "containerNames": [
-                              "${APPLICATION_NAME}"
-                           ],
-                           "from": {
-                              "kind": "ImageStreamTag",
-                              "name": "configserver:latest"
-                           }
-                        }
                      }
                   ],
                   "replicas": 1,
