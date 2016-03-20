@@ -35,92 +35,16 @@
                "displayName": "Application hostname"
             },
             {
-               "description": "Git source URI for application",
-               "name": "GIT_URI",
-               "value": "https://github.com/mchudgins/configserver.git"
-            },
-            {
-               "description": "Git branch/tag reference",
-               "name": "GIT_REF",
-               "value": "master"
-            },
-            {
-               "description": "Git Directory",
-               "name": "CONTEXT_DIR",
-               "value": ""
+               "description": "Git Configuration Repository",
+               "name": "CONFIG_SETTINGS_REPO",
+               "value": "https://github.com/mchudgins/config-props.git"
             },
             {
                "description": "Application options. These options will be passed to the Spring Boot command line",
                "name": "APP_OPTIONS"
-            },
-            {
-               "description": "Github trigger secret",
-               "name": "GITHUB_TRIGGER_SECRET",
-               "from": "[a-zA-Z0-9]{8}",
-               "generate": "expression"
             }
          ],
          "objects": [
-            {
-               "kind": "BuildConfig",
-               "apiVersion": "v1",
-               "metadata": {
-                  "name": "${APPLICATION_NAME}"
-               },
-               "spec": {
-                  "triggers": [
-                     {
-                        "type": "GitHub",
-                        "github": {
-                           "secret": "${GITHUB_TRIGGER_SECRET}"
-                        }
-                     },
-                     {
-                        "type": "ImageChange",
-                        "imageChange": {}
-                     }
-                  ],
-                  "source": {
-                     "type": "Git",
-                     "git": {
-                        "uri": "${GIT_URI}",
-                        "ref": "${GIT_REF}"
-                     },
-                     "contextDir": "${CONTEXT_DIR}"
-                  },
-                  "strategy": {
-                     "type": "Source",
-                     "sourceStrategy": {
-                        "from": {
-                           "kind": "ImageStreamTag",
-                           "name": "springboot-sti:latest"
-                        }
-                     }
-                  },
-                  "output": {
-                     "to": {
-                        "kind": "ImageStreamTag",
-                        "name": "${APPLICATION_NAME}:latest"
-                     }
-                  },
-                  "resources": {}
-               }
-            },
-            {
-               "kind": "ImageStream",
-               "apiVersion": "v1",
-               "metadata": {
-                  "name": "${APPLICATION_NAME}"
-               },
-               "spec": {
-                  "dockerImageRepository": "",
-                  "tags": [
-                     {
-                        "name": "latest"
-                     }
-                  ]
-               }
-            },
             {
                "kind": "DeploymentConfig",
                "apiVersion": "v1",
@@ -150,7 +74,7 @@
                            ],
                            "from": {
                               "kind": "ImageStreamTag",
-                              "name": "${APPLICATION_NAME}:latest"
+                              "name": "configserver:latest"
                            }
                         }
                      }
@@ -169,16 +93,22 @@
                         "containers": [
                            {
                               "name": "${APPLICATION_NAME}",
-                              "image": "${APPLICATION_NAME}",
+                              "image": "registry.dstresearch.com/configserver:0.0.1-SNAPSHOT",
+                              "env" : [
+                                 {
+                                    "name" : "GIT_REPO_URL",
+                                    "value": "${CONFIG_SETTINGS_REPO}"
+                                 }
+                              ],
                               "ports": [
                                  {
-                                    "containerPort": 8080,
+                                    "containerPort": 8888,
                                     "protocol": "TCP"
                                  }
                               ],
                               "livenessProbe": {
                                  "tcpSocket": {
-                                    "port": 8080
+                                    "port": 8888
                                  },
                                  "initialDelaySeconds": 30,
                                  "timeoutSeconds": 1
@@ -191,6 +121,9 @@
                                  "privileged": false
                               }
                            }
+                        ],
+                        "imagePullSecrets": [
+                           { "name" : "dstresearchkey" }
                         ],
                         "restartPolicy": "Always",
                         "dnsPolicy": "ClusterFirst"
@@ -222,8 +155,8 @@
                   "ports": [
                      {
                         "name": "${APPLICATION_NAME}-http",
-                        "port": 8080,
-                        "targetPort": 8080
+                        "port": 80,
+                        "targetPort": 8888
                      }
                   ],
                   "selector": {
