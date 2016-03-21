@@ -4,7 +4,47 @@
    "metadata": {
       "name": "config-server"
    },
-   "items": [
+     "items": [
+        {
+           "kind": "ImageStream",
+           "apiVersion": "v1",
+           "metadata": {
+              "name": "centos"
+           },
+           "spec": {
+              "dockerImageRepository": "",
+              "tags": [
+                 {
+                    "name": "7",
+                    "from" : {
+                        "kind" : "ImageStreamTag",
+                        "namespace" : "openshift",
+                        "name" : "centos:7"
+                    }
+                 }
+              ]
+           }
+        },
+        {
+           "kind": "ImageStream",
+           "apiVersion": "v1",
+           "metadata": {
+              "name": "springboot-sti"
+           },
+           "spec": {
+              "dockerImageRepository": "",
+              "tags": [
+                 {
+                    "name": "latest",
+                    "from" : {
+                        "kind" : "ImageStreamTag",
+                        "namespace" : "golden",
+                        "name" : "springboot-sti:latest"
+                    }
+                 }
+              ]
+           }
+        },
       {
          "kind": "Template",
          "apiVersion": "v1",
@@ -40,11 +80,92 @@
                "value": "https://github.com/mchudgins/testRepo.git"
             },
             {
+               "description": "Git source URI for application",
+               "name": "GIT_URI",
+               "value": "https://github.com/mchudgins/configserver.git"
+            },
+            {
+               "description": "Git branch/tag reference",
+               "name": "GIT_REF",
+               "value": "master"
+            },
+            {
+               "description": "Git Directory",
+               "name": "CONTEXT_DIR",
+               "value": ""
+            },
+            {
                "description": "Application options. These options will be passed to the Spring Boot command line",
                "name": "APP_OPTIONS"
             }
          ],
          "objects": [
+           {
+              "kind": "BuildConfig",
+              "apiVersion": "v1",
+              "metadata": {
+                 "name": "${APPLICATION_NAME}"
+              },
+              "spec": {
+                 "triggers": [
+                    {
+                       "type": "GitHub",
+                       "github": {
+                          "secret": "${GITHUB_TRIGGER_SECRET}"
+                       }
+                    },
+                    {
+                       "type": "Generic",
+                       "generic": {
+                          "secret": "${GENERIC_TRIGGER_SECRET}"
+                       }
+                    },
+                    {
+                       "type": "ImageChange",
+                       "imageChange": {}
+                    }
+                 ],
+                 "source": {
+                    "type": "Git",
+                    "git": {
+                       "uri": "${GIT_URI}",
+                       "ref": "${GIT_REF}"
+                    },
+                    "contextDir": "${CONTEXT_DIR}"
+                 },
+                 "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                       "from": {
+                          "kind": "ImageStreamTag",
+                          "name": "springboot-sti:latest"
+                       }
+                    }
+                 },
+                 "output": {
+                    "to": {
+                       "kind": "ImageStreamTag",
+                       "name": "${APPLICATION_NAME}:latest"
+                    }
+                 },
+                 "resources": {}
+              }
+           },
+           {
+              "kind": "ImageStream",
+              "apiVersion": "v1",
+              "metadata": {
+                 "name": "${APPLICATION_NAME}"
+              },
+              "spec": {
+                 "dockerImageRepository": "",
+                 "tags": [
+                    {
+                       "name": "latest"
+                    }
+                 ]
+              }
+           },
             {
                "kind": "DeploymentConfig",
                "apiVersion": "v1",
@@ -80,7 +201,7 @@
                         "containers": [
                            {
                               "name": "${APPLICATION_NAME}",
-                              "image": "registry.dstresearch.com/configserver:0.0.1-SNAPSHOT",
+                              "image": "${APPLICATION_NAME}",
                               "env" : [
                                  {
                                     "name" : "GIT_REPO_URL",
@@ -108,9 +229,6 @@
                                  "privileged": false
                               }
                            }
-                        ],
-                        "imagePullSecrets": [
-                           { "name" : "dstresearchkey" }
                         ],
                         "restartPolicy": "Always",
                         "dnsPolicy": "ClusterFirst"
