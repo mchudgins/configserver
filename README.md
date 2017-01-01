@@ -28,9 +28,17 @@ comment out the monitor and redis dependencies.
 
 | Path             | Description  |
 |------------------|--------------|
+|/{label}/{application}-{profile}.yml|obtain the entire property set for a git label|
+|/{label}/{application}-{profile}.properties||
 | /{app}/{profile} | Configuration data for app in Spring profile (comma-separated).|
-| /{app}/{profile}/{label} | Add a git label |
-| /{app}/{profiels}{label}/{path} | An environment-specific plain text config file (at "path") |
+| /{app}/{profile}/{label} | Reference by git label or branch|
+|/{application}/{profile}[/{label}]||
+|/{application}-{profile}.yml||
+|/{application}-{profile}.properties|defaults to master label|
+
+Note that 'application' appears to be the basename of the .properties file.  for example,
+a file named 'fubar.properties' on git branch 'test' without any Spring profile enabled,
+will be available at /test/fubar-anyprofilename.properties or /test/fubar-something.yml
 
 ## Security
 
