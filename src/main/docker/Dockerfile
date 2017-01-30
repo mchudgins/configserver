@@ -11,5 +11,5 @@ RUN mkdir /target \
 
 COPY docker-entrypoint.sh /entrypoint.sh
 
-ADD configserver-0.0.1-SNAPSHOT.jar /app.jar
+ADD configserver-0.0.2-SNAPSHOT.jar /app.jar
 
