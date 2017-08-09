@@ -35,6 +35,7 @@ comment out the monitor and redis dependencies.
 |/{application}/{profile}[/{label}]||
 |/{application}-{profile}.yml||
 |/{application}-{profile}.properties|defaults to master label|
+|/{application}/{profile}/{label}/{path}|An environment-specific plain text config file (at "path")|
 
 Note that 'application' appears to be the basename of the .properties file.  for example,
 a file named 'fubar.properties' on git branch 'test' without any Spring profile enabled,
