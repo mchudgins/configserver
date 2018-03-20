@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -v
 #set -e
 
 VAULT_TOKEN_FILE=/usr/local/etc/vault/token
@@ -41,10 +41,17 @@ if [[ "$1" = 'runapp' ]]; then
             exit 1
         fi
         export VAULT_TOKEN=$(cat ${VAULT_TOKEN_FILE})
+    else
+        # sometimes the token has a newline, which breaks vault
+        VAULT_TOKEN=$(echo ${VAULT_TOKEN} | tr -d "\n")
     fi
     if [[ -z "${VAULT_TOKEN}" ]]; then
         echo "A 'VAULT_TOKEN' is required to obtain the necessary secrets. Exiting..."
         exit 1
+    fi
+
+    if [[ "${LOG_LEVEL}" == "INSECURE" ]]; then
+        echo VAULT_TOKEN "${VAULT_TOKEN}" END
     fi
 
     GIT_REPO_PWORD="$(vault read -address=${VAULT_ADDR} -field=password secret/projects/${POD_NAMESPACE}/gitlab)"
@@ -60,6 +67,10 @@ if [[ "$1" = 'runapp' ]]; then
 
         cd ${tmpdir}
         url=$(echo ${GIT_REPO_URL} | sed -e "s^https://^https://${GIT_REPO_UID}:${GIT_REPO_PWORD}@^")
+
+        # grr, need to workaround old git bug before cloning
+        export GIT_COMMITTER_NAME="somebody"
+        export GIT_COMMITTER_EMAIL="somebody@example.com"
         git clone ${url}
 
         clonedir=`basename ${GIT_REPO_URL} .git`
@@ -93,7 +104,7 @@ if [[ "$1" = 'runapp' ]]; then
 		APPFLAGS="${APPFLAGS} -Dspring.cloud.config.server.git.uri=${GIT_REPO_URL}"
 	fi
 
-    cat <<EOF >application.properties
+    cat <<EOF >/config/application.properties
 server.port=8443
 server.ssl.enabled=true
 server.ssl.protocol=TLSv1.2
