@@ -27,7 +27,7 @@ target/$(ARTIFACT):
 	$(MVN) package
 
 container: $(container_deps)
-	cp target/$(ARTIFACT) $(DOCKER_DIR)
+	cp target/$(ARTIFACT) $(DOCKER_DIR)/app.jar
 	sudo docker build -t $(ARTIFACT_NAME):$(APP_VERSION) $(DOCKER_DIR)
 
 run_container:

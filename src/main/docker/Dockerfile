@@ -26,5 +26,5 @@ COPY docker-entrypoint.sh /entrypoint.sh
 COPY vault /usr/local/bin
 RUN chmod +x /usr/local/bin/vault
 
-ADD configserver-0.0.4-SNAPSHOT.jar /app.jar
+ADD app.jar /app.jar
 
