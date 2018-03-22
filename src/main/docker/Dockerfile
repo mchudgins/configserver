@@ -1,4 +1,4 @@
-FROM java:9-jre
+FROM openjdk:9-jre
 
 EXPOSE 8443
 EXPOSE 9100
