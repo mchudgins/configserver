@@ -97,7 +97,7 @@ if [[ "$1" = 'runapp' ]]; then
         rm -rf ${tmpdir}
     fi
 
-	#APPFLAGS="-Djava.security.egd=file:/dev/./urandom -Djavax.net.debug=ssl -Dhttps.protocols=TLSv1.2"
+#	APPFLAGS="-Djava.security.egd=file:/dev/./urandom -Djavax.net.debug=ssl -Dhttps.protocols=TLSv1.2"
 	APPFLAGS="-Djava.security.egd=file:/dev/./urandom -Dhttps.protocols=TLSv1.2"
 	APPFLAGS="${APPFLAGS} -javaagent:/usr/local/bin/jmx_prometheus_javaagent-0.2.0.jar=9100:/usr/local/etc/jmx-exporter.yaml"
 	if [[ -n "$GIT_REPO_URL" ]]; then
@@ -108,7 +108,8 @@ if [[ "$1" = 'runapp' ]]; then
 server.port=8443
 server.ssl.enabled=true
 server.ssl.protocol=TLSv1.2
-server.ssl.ciphers=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+#server.ssl.ciphers=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+server.ssl.ciphers=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
 server.ssl.key-store=file://${KEYSTORE}
 server.ssl.key-store-password=${JKS_KEY}
 server.ssl.keyStoreType=PKCS12
