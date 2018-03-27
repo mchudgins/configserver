@@ -84,12 +84,28 @@ if [[ "$1" = 'runapp' ]]; then
             exit 1
         fi
 
+        # get the private key of the certificate from vault
+        vault read -address=${VAULT_ADDR} -field=key secret/certificates/config.dst.cloud >key.pem
+
+	# make sure all the components end with a newline
+        echo "" >>${clonedir}/certificates/config.dst.cloud.pem
+        echo "" >>${clonedir}/certificates/ucap-ca-bundle.pem
+        echo "" >>key.pem
+
         # bundle the private key, public key, and chain together into one big file
-        vault read -address=${VAULT_ADDR} -field=key secret/certificates/config.dst.cloud | \
-            cat -s ${clonedir}/certificates/config.dst.cloud.pem ${clonedir}/certificates/ucap-ca-bundle.pem - >cert.pem
+        cat ${clonedir}/certificates/config.dst.cloud.pem ${clonedir}/certificates/ucap-ca-bundle.pem key.pem >cert.pem
 
         # create the keystore
         export JKS_KEY
+        if [[ "${LOG_LEVEL}" == "INSECURE" ]]; then
+            echo VAULT_TOKEN "${VAULT_TOKEN}"
+            echo GIT_REPO_PWORD "${GIT_REPO_PWORD}"
+            echo JKS_KEY "${JKS_KEY}"
+            echo "cert.pem:"
+            cat cert.pem
+            echo "-------------------------"
+        fi
+
         openssl pkcs12 -export -in cert.pem -out ${KEYSTORE} \
             -name config-server -passout env:JKS_KEY
 

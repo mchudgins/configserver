@@ -26,7 +26,7 @@ RUN update-ca-certificates
 COPY vault /usr/local/bin
 RUN chmod +x /usr/local/bin/vault
 
+ADD app.jar /app.jar
 COPY docker-entrypoint.sh /entrypoint.sh
 
-ADD app.jar /app.jar
 
